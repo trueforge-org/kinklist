@@ -963,17 +963,9 @@
                         
                         var levels = Object.keys(colors);
                         var x = context.canvas.width - 15 - (120 * levels.length);                      
-                        var patternImg = document.getElementById('patternImg');
-                        var pattern = context.createPattern(patternImg,'repeat');
                         for(var i = 0; i < levels.length; i++) {
                             context.beginPath();
                             context.arc(x + (120 * i), 17, 8, 0, 2 * Math.PI, false);
-                            if (colors[levels[i]] != 'pattern') {
-                                context.fillStyle = colors[levels[i]];
-                            }
-                            else {
-                                context.fillStyle = pattern;
-                            }
                             context.fill();
                             context.strokeStyle = 'rgba(0, 0, 0, 0.5)'
                             context.lineWidth = 1;
@@ -984,13 +976,13 @@
                         }
                     },
                     setupCanvas: function(width, height, username){
-                        $('#mainCanvas').remove();
+                        $('canvas').remove();;
                         var canvas = document.createElement('canvas');
                         canvas.setAttribute('id', 'mainCanvas');
                         canvas.width = width;
                         canvas.height = height;
                         
-                        var $canvas = $('#mainCanvas');
+                        var $canvas = $(canvas);;
                         $canvas.css({
                             width: width,
                             height: height
@@ -1030,8 +1022,7 @@
                             var x = drawCall.x + 5 + (drawCall.data.choices.length * 20);
                             var y = drawCall.y - 6;
                             context.fillText(drawCall.data.text, x, y);
-                            var patternImg = document.getElementById('patternImg');
-                            var pattern = context.createPattern(patternImg,'repeat');
+							
                             // Circles
                             for(var i = 0; i < drawCall.data.choices.length; i++){
                                 var choice = drawCall.data.choices[i];
@@ -1042,12 +1033,7 @@
                                 
                                 context.beginPath();
                                 context.arc(x, y, 8, 0, 2 * Math.PI, false);
-                                if (color != 'pattern') {
-                                    context.fillStyle = color;
-                                }
-                                else {
-                                    context.fillStyle = pattern;
-                                }
+								context.fillStyle = color;
                                 context.fill();
                                 context.strokeStyle = 'rgba(0, 0, 0, 0.5)'
                                 context.lineWidth = 1;
