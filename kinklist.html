@@ -966,6 +966,7 @@
                         for(var i = 0; i < levels.length; i++) {
                             context.beginPath();
                             context.arc(x + (120 * i), 17, 8, 0, 2 * Math.PI, false);
+							context.fillStyle = colors[levels[i]];
                             context.fill();
                             context.strokeStyle = 'rgba(0, 0, 0, 0.5)'
                             context.lineWidth = 1;
@@ -976,13 +977,13 @@
                         }
                     },
                     setupCanvas: function(width, height, username){
-                        $('canvas').remove();;
+                        $('canvas').remove();
                         var canvas = document.createElement('canvas');
                         canvas.setAttribute('id', 'mainCanvas');
                         canvas.width = width;
                         canvas.height = height;
                         
-                        var $canvas = $(canvas);;
+                        var $canvas = $(canvas);
                         $canvas.css({
                             width: width,
                             height: height
@@ -1167,10 +1168,6 @@
                             }
                         }
                         
-<<<<<<< HEAD
-                        $('#Loading').hide();
-                        return $(canvas).insertBefore($('#InputList'));
-=======
                         // return $(canvas).insertBefore($('#InputList'));
                         
                         // Send canvas to imgur
@@ -1197,7 +1194,6 @@
                                 alert('Failed to upload to imgur, could not connect');
                             }
                         });
->>>>>>> pr/2
                     },
                     encode: function(base, input){
                         var hashBase = inputKinks.hashChars.length;
