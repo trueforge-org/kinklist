@@ -5,6 +5,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script>
         <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNui8sowAAAAWdEVYdENyZWF0aW9uIFRpbWUAMTAvMjEvMTV5ehY1AAAAZElEQVQ4jaWTwQ3AIAwDbcT+I9f9hjYQA/mAkO7igKAACWdFAF0A2gb0hP0uCyTATyAJSoaK5xGyEmTC9lktmORUdAQvBQ5cJshktoDk0HkmKRNUEmuE6ztYVXe7bT+jW7z9zi8qYiodCjCHKgAAAABJRU5ErkJggg==">
         <style>
             body {
@@ -33,7 +34,7 @@
             }
             th.choicesCol {
                 box-sizing: border-box;
-                width: 125px;
+                width: 146px;
             }
             th + th {
                 border-left: none;
@@ -520,6 +521,7 @@
                 <div><span data-color="#FDFD6B" class="choice okay"></span> <span class="legend-text">Okay</span></div>
                 <div><span data-color="#DB6C00" class="choice maybe"></span> <span class="legend-text">Maybe</span></div>
                 <div><span data-color="#920000" class="choice no"></span> <span class="legend-text">No</span></div>
+                <div><span data-color="pattern" class="choice try"></span> <span class="legend-text">Want To Try</span></div>
             </div>
             <div id="ExportWrapper">
                 <input type="text" id="URL">
@@ -712,7 +714,6 @@
             </div>
         </div>
         <script>
-            
             var log = function(val, base) {
                 return Math.log(val) / Math.log(base);
             };
@@ -745,9 +746,27 @@
             };
             
             var kinks = {};
-            var inputKinks = {}
-            var colors = {}
+            var inputKinks = {};
+            var colors = {};
             var level = {};
+            
+            var hatchPattern = function(patCanvas, x1, y1, dx, dy, delta){
+               var patContext = patCanvas.getContext('2d');
+               patContext.rect(x1, y1, dx, dy);
+               patContext.save();
+               patContext.clip();
+               var majorAxe = _.max([dx, dy]);
+               patContext.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+  
+              _.each(_.range(-1*(majorAxe) , majorAxe, delta), function(n, i){
+  
+                patContext.beginPath();
+                patContext.moveTo(dy - n + x1 , y1);
+                patContext.lineTo(-n + x1, y1+ dy);
+                patContext.stroke();
+              })
+              patContext.restore();
+            };
             
             $(function(){
                 
@@ -872,6 +891,28 @@
                         // Read hash
                         inputKinks.parseHash();
                         
+                        var patCanvas = document.createElement('canvas');
+                        patCanvas.height = 30;
+                        patCanvas.width = 30;
+                        hatchPattern(patCanvas, 0,0,30,30,5);
+                        patCanvas.toBlob(function(blob) {
+                          var patternImg = document.createElement('img');
+                          patternImg.crossOrigin = 'Anonymous';
+                          var url = URL.createObjectURL(blob);
+
+                          patternImg.onload = function() {
+                            // no longer need to read the blob so it's revoked
+                            URL.revokeObjectURL(url);
+                          };
+
+                          patternImg.src = url;
+                          patternImg.setAttribute('id', 'patternImg');
+                          patternImg.setAttribute('hidden','true');
+//                        var body = document.getElementsByTagName('body')[0]
+                          document.body.appendChild(patternImg);
+                        },'image/png');
+
+                        
                         // Make export button work
                         $('#Export').on('click', inputKinks.export);
                         $('#URL').on('click', function(){ this.select(); });
@@ -912,11 +953,18 @@
                         context.fillStyle = '#000000';
                         
                         var levels = Object.keys(colors);
-                        var x = context.canvas.width - 15 - (120 * levels.length);
+                        var x = context.canvas.width - 15 - (120 * levels.length);                      
+                        var patternImg = document.getElementById('patternImg');
+                        var pattern = context.createPattern(patternImg,'repeat');
                         for(var i = 0; i < levels.length; i++) {
                             context.beginPath();
                             context.arc(x + (120 * i), 17, 8, 0, 2 * Math.PI, false);
-                            context.fillStyle = colors[levels[i]];
+                            if (colors[levels[i]] != 'pattern') {
+                                context.fillStyle = colors[levels[i]];
+                            }
+                            else {
+                                context.fillStyle = pattern;
+                            }
                             context.fill();
                             context.strokeStyle = 'rgba(0, 0, 0, 0.5)'
                             context.lineWidth = 1;
@@ -927,12 +975,13 @@
                         }
                     },
                     setupCanvas: function(width, height, username){
-                        $('canvas').remove();
+                        $('#mainCanvas').remove();
                         var canvas = document.createElement('canvas');
+                        canvas.setAttribute('id', 'mainCanvas');
                         canvas.width = width;
                         canvas.height = height;
                         
-                        var $canvas = $(canvas);
+                        var $canvas = $('#mainCanvas');
                         $canvas.css({
                             width: width,
                             height: height
@@ -972,7 +1021,8 @@
                             var x = drawCall.x + 5 + (drawCall.data.choices.length * 20);
                             var y = drawCall.y - 6;
                             context.fillText(drawCall.data.text, x, y);
-                            
+                            var patternImg = document.getElementById('patternImg');
+                            var pattern = context.createPattern(patternImg,'repeat');
                             // Circles
                             for(var i = 0; i < drawCall.data.choices.length; i++){
                                 var choice = drawCall.data.choices[i];
@@ -983,7 +1033,12 @@
                                 
                                 context.beginPath();
                                 context.arc(x, y, 8, 0, 2 * Math.PI, false);
-                                context.fillStyle = color;
+                                if (color != 'pattern') {
+                                    context.fillStyle = color;
+                                }
+                                else {
+                                    context.fillStyle = pattern;
+                                }
                                 context.fill();
                                 context.strokeStyle = 'rgba(0, 0, 0, 0.5)'
                                 context.lineWidth = 1;
@@ -1117,8 +1172,37 @@
                             }
                         }
                         
+<<<<<<< HEAD
                         $('#Loading').hide();
                         return $(canvas).insertBefore($('#InputList'));
+=======
+                        // return $(canvas).insertBefore($('#InputList'));
+                        
+                        // Send canvas to imgur
+                        $.ajax({
+                            url: 'https://api.imgur.com/3/image',
+                            type: 'POST',
+                            headers: {
+                                // Your application gets an imgurClientId from Imgur
+                                Authorization: 'Client-ID ' + imgurClientId,
+                                Accept: 'application/json'
+                            },
+                            data: {
+                                // convert the image data to base64
+                                image:  canvas.toDataURL().split(',')[1],
+                                type: 'base64'
+                            },
+                            success: function(result) {
+                                $('#Loading').hide();
+                                var url = 'https://i.imgur.com/' + result.data.id + '.png';
+                                $('#URL').val(url).fadeIn();
+                            },
+                            fail: function(){
+                                $('#Loading').hide();
+                                alert('Failed to upload to imgur, could not connect');
+                            }
+                        });
+>>>>>>> pr/2
                     },
                     encode: function(base, input){
                         var hashBase = inputKinks.hashChars.length;
@@ -1342,8 +1426,15 @@
                     var color = $choice.data('color');
                     var cssClass = this.className.replace('choice ', '').trim();
                     
-                    addCssRule('.choice.' + cssClass, 'background-color: ' + color + ';');
-                    colors[text] = color;
+                    if (color != 'pattern') {
+                        addCssRule('.choice.' + cssClass, 'background-color: ' + color + ';');
+                        colors[text] = color;
+                    }
+                    else {
+                    addCssRule('.choice.' + cssClass, 'background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNScgaGVpZ2h0PScxNSc+CiAgPHJlY3Qgd2lkdGg9JzE1JyBoZWlnaHQ9JzE1JyBmaWxsPSd3aGl0ZScvPgogIDxwYXRoIGQ9J00tMSwxIGwyLC0yCiAgICAgICAgICAgTTAsNSBsMTUsLTE1CiAgICAgICAgICAgTTAsMTAgbDE1LC0xNQogICAgICAgICAgIE0wLDE1IGwxNSwtMTUKICAgICAgICAgICBNMCwyMCBsMTUsLTE1CiAgICAgICAgICAgTTAsMjUgbDE1LC0xNQogICAgICAgICAgIE0xNCwxNiBsMiwtMicgc3Ryb2tlPSdibGFjaycgc3Ryb2tlLXdpZHRoPScxJy8+Cjwvc3ZnPgo="); background-repeat: repeat');
+                    
+                        colors[text] = 'pattern';
+                    }
                     level[text] = cssClass;
                 });
         
