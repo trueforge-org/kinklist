@@ -523,7 +523,7 @@
             </div>
             <div id="ExportWrapper">
                 <input type="text" id="URL">
-                <button id="Export">Export</button>
+                <button id="Export">Create image</button>
                 <div id="Loading">Loading</div>
             </div>
             <button id="StartBtn"></button>
@@ -1117,32 +1117,8 @@
                             }
                         }
                         
-                        //return $(canvas).insertBefore($('#InputList'));
-                        
-                        // Send canvas to imgur
-                        $.ajax({
-                            url: 'https://api.imgur.com/3/image',
-                            type: 'POST',
-                            headers: {
-                                // Your application gets an imgurClientId from Imgur
-                                Authorization: 'Client-ID ' + imgurClientId,
-                                Accept: 'application/json'
-                            },
-                            data: {
-                                // convert the image data to base64
-                                image:  canvas.toDataURL().split(',')[1],
-                                type: 'base64'
-                            },
-                            success: function(result) {
-                                $('#Loading').hide();
-                                var url = 'https://i.imgur.com/' + result.data.id + '.png';
-                                $('#URL').val(url).fadeIn();
-                            },
-                            fail: function(){
-                                $('#Loading').hide();
-                                alert('Failed to upload to imgur, could not connect');
-                            }
-                        });
+                        $('#Loading').hide();
+                        return $(canvas).insertBefore($('#InputList'));
                     },
                     encode: function(base, input){
                         var hashBase = inputKinks.hashChars.length;
