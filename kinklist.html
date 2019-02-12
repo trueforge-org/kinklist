@@ -1417,15 +1417,8 @@
                     var color = $choice.data('color');
                     var cssClass = this.className.replace('choice ', '').trim();
                     
-                    if (color != 'pattern') {
-                        addCssRule('.choice.' + cssClass, 'background-color: ' + color + ';');
-                        colors[text] = color;
-                    }
-                    else {
-                    addCssRule('.choice.' + cssClass, 'background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNScgaGVpZ2h0PScxNSc+CiAgPHJlY3Qgd2lkdGg9JzE1JyBoZWlnaHQ9JzE1JyBmaWxsPSd3aGl0ZScvPgogIDxwYXRoIGQ9J00tMSwxIGwyLC0yCiAgICAgICAgICAgTTAsNSBsMTUsLTE1CiAgICAgICAgICAgTTAsMTAgbDE1LC0xNQogICAgICAgICAgIE0wLDE1IGwxNSwtMTUKICAgICAgICAgICBNMCwyMCBsMTUsLTE1CiAgICAgICAgICAgTTAsMjUgbDE1LC0xNQogICAgICAgICAgIE0xNCwxNiBsMiwtMicgc3Ryb2tlPSdibGFjaycgc3Ryb2tlLXdpZHRoPScxJy8+Cjwvc3ZnPgo="); background-repeat: repeat');
-                    
-                        colors[text] = 'pattern';
-                    }
+					addCssRule('.choice.' + cssClass, 'background-color: ' + color + ';');
+					colors[text] = color;
                     level[text] = cssClass;
                 });
         
