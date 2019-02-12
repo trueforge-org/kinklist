@@ -12,4 +12,8 @@ Also, each time you make a change to your kinklist, the URL updates. Giving you 
 
 #### TODO
 
+<<<<<<< HEAD
 Add Caging and Suspension
+=======
+Add Caging and Suspension
+>>>>>>> pr/7
