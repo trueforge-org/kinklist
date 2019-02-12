@@ -1,7 +1,7 @@
 # KinkList
 Easily create kink list
 
-[Make yours here](https://rawgit.com/coreyzev/KinkList/master/kinklist.html)
+[Make yours here](https://endlesseden.github.io/kinklist.html)
 
 #### Example
 
