@@ -762,6 +762,7 @@
             </div>
         </div>
         <script>
+		
             var log = function(val, base) {
                 return Math.log(val) / Math.log(base);
             };
@@ -797,24 +798,6 @@
             var inputKinks = {};
             var colors = {};
             var level = {};
-            
-            var hatchPattern = function(patCanvas, x1, y1, dx, dy, delta){
-               var patContext = patCanvas.getContext('2d');
-               patContext.rect(x1, y1, dx, dy);
-               patContext.save();
-               patContext.clip();
-               var majorAxe = _.max([dx, dy]);
-               patContext.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-  
-              _.each(_.range(-1*(majorAxe) , majorAxe, delta), function(n, i){
-  
-                patContext.beginPath();
-                patContext.moveTo(dy - n + x1 , y1);
-                patContext.lineTo(-n + x1, y1+ dy);
-                patContext.stroke();
-              })
-              patContext.restore();
-            };
             
             $(function(){
                 
@@ -938,28 +921,6 @@
                         
                         // Read hash
                         inputKinks.parseHash();
-                        
-                        var patCanvas = document.createElement('canvas');
-                        patCanvas.height = 30;
-                        patCanvas.width = 30;
-                        hatchPattern(patCanvas, 0,0,30,30,5);
-                        patCanvas.toBlob(function(blob) {
-                          var patternImg = document.createElement('img');
-                          patternImg.crossOrigin = 'Anonymous';
-                          var url = URL.createObjectURL(blob);
-
-                          patternImg.onload = function() {
-                            // no longer need to read the blob so it's revoked
-                            URL.revokeObjectURL(url);
-                          };
-
-                          patternImg.src = url;
-                          patternImg.setAttribute('id', 'patternImg');
-                          patternImg.setAttribute('hidden','true');
-//                        var body = document.getElementsByTagName('body')[0]
-                          document.body.appendChild(patternImg);
-                        },'image/png');
-
                         
                         // Make export button work
                         $('#Export').on('click', inputKinks.export);
