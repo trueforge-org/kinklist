@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Hypno-Kinklist</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNui8sowAAAAWdEVYdENyZWF0aW9uIFRpbWUAMTAvMjEvMTV5ehY1AAAAZElEQVQ4jaWTwQ3AIAwDbcT+I9f9hjYQA/mAkO7igKAACWdFAF0A2gb0hP0uCyTATyAJSoaK5xGyEmTC9lktmORUdAQvBQ5cJshktoDk0HkmKRNUEmuE6ztYVXe7bT+jW7z9zi8qYiodCjCHKgAAAABJRU5ErkJggg==">
-        <link rel="stylesheet" type="text/css" href="./assets/style.min.css">
-        <script type="text/javascript" src="//code.jquery.com/jquery-3.3.1.min.js"></script>
-    </head>
-    <body>
-        <div class="widthWrapper">
-            <button id="Edit"></button>
-            <h1>Hypno Kink List</h1>
-            <div class="legend">
-                <div><span data-color="#920000" class="choice no"></span> <span class="legend-text">No / N/A</span></div>
-                <div><span data-color="#DB6C00" class="choice maybe"></span> <span class="legend-text">Maybe</span></div>
-                <div><span data-color="#FDFD6B" class="choice okay"></span> <span class="legend-text">Okay</span></div>
-                <div><span data-color="#23FD22" class="choice like"></span> <span class="legend-text">Like</span></div>
-                <div><span data-color="#6DB5FE" class="choice favorite"></span> <span class="legend-text">Favorite</span></div>
-                <div><span data-color="#CC99CC" class="choice try"></span> <span class="legend-text">Want To Try</span></div>
-            </div>
-            <div id="ExportWrapper">
-                <input type="text" id="URL">
-                <button id="Export">Export</button>
-                <div id="Loading">Loading</div>
-            </div>
-            <button id="StartBtn"></button>
-            <div id="InputList"></div>
-        </div>
-        <div id="EditOverlay" class="overlay">
-            <textarea id="Kinks">
+	<head>
+		<title>Hypno-Kinklist</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNui8sowAAAAWdEVYdENyZWF0aW9uIFRpbWUAMTAvMjEvMTV5ehY1AAAAZElEQVQ4jaWTwQ3AIAwDbcT+I9f9hjYQA/mAkO7igKAACWdFAF0A2gb0hP0uCyTATyAJSoaK5xGyEmTC9lktmORUdAQvBQ5cJshktoDk0HkmKRNUEmuE6ztYVXe7bT+jW7z9zi8qYiodCjCHKgAAAABJRU5ErkJggg==">
+		<link rel="stylesheet" type="text/css" href="./assets/style.min.css">
+		<script type="text/javascript" src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+	</head>
+	<body>
+		<div class="widthWrapper">
+			<button id="Edit"></button>
+			<h1>Hypno Kink List</h1>
+			<div class="legend">
+				<div><span data-color="#920000" class="choice no"></span> <span class="legend-text">No / N/A</span></div>
+				<div><span data-color="#DB6C00" class="choice maybe"></span> <span class="legend-text">Maybe</span></div>
+				<div><span data-color="#FDFD6B" class="choice okay"></span> <span class="legend-text">Okay</span></div>
+				<div><span data-color="#23FD22" class="choice like"></span> <span class="legend-text">Like</span></div>
+				<div><span data-color="#6DB5FE" class="choice favorite"></span> <span class="legend-text">Favorite</span></div>
+				<div><span data-color="#CC99CC" class="choice try"></span> <span class="legend-text">Want To Try</span></div>
+			</div>
+			<div id="ExportWrapper">
+				<input type="text" id="URL">
+				<button id="Export">Export</button>
+				<div id="Loading">Loading</div>
+			</div>
+			<button id="StartBtn"></button>
+			<div id="InputList"></div>
+		</div>
+		<div id="EditOverlay" class="overlay">
+			<textarea id="Kinks">
 #Partner Choice
 (General)
 * I enjoy working with males
@@ -255,22 +255,22 @@
 * Wake up trigger
 * Only counting to three
 * Just being told to come back or wake up
-            </textarea>
-            <button id="KinksOK">Accept</button>
-        </div>
-        <div id="InputOverlay" class="overlay">
-            <div class="widthWrapper">
-                <div id="InputPrevious"></div>
-                <div id="InputCurrent">
-                    <h2 id="InputCategory"></h2>
-                    <h3 id="InputField"></h3>
-                    <button class="closePopup">&times;</button>
-                    <div id="InputValues"></div>
-                </div>
-                <div id="InputNext"></div>
-            </div>
-        </div>
-        <footer id="footer">Data stolen with ♥ from Herald</footer>
-        <script type="text/javascript" src="./assets/script.min.js"></script>
-    </body>
+			</textarea>
+			<button id="KinksOK">Accept</button>
+		</div>
+		<div id="InputOverlay" class="overlay">
+			<div class="widthWrapper">
+				<div id="InputPrevious"></div>
+				<div id="InputCurrent">
+					<h2 id="InputCategory"></h2>
+					<h3 id="InputField"></h3>
+					<button class="closePopup">&times;</button>
+					<div id="InputValues"></div>
+				</div>
+				<div id="InputNext"></div>
+			</div>
+		</div>
+		<footer id="footer">Data stolen with ♥ from Herald</footer>
+		<script type="text/javascript" src="./assets/script.min.js"></script>
+	</body>
 </html>
