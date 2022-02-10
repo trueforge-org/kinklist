@@ -7,4 +7,4 @@ Updated and personalized version of the KinkList, forked off from NanoAi's versi
 
 ![Example kinklist](https://i.imgur.com/hMuRllD.png)
 
-Also, each time you make a change to your kinklist, the URL updates. Giving you a *unique* URL to share your kinklist with others.
+To make your own verion, make a fork off this one or another and edit the kinklist.html file
