@@ -1,7 +1,7 @@
 # KinkList
-Easily create kink list
+Updated and personalized version of the KinkList, forked off from NanoAi's version: (https://github.com/NanoAi/KinkList)
 
-[Make yours here](https://raw.githack.com/NanoAi/KinkList/master/kinklist.html)
+[Fill it out yourself here:]
 
 #### Example
 
