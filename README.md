@@ -1,5 +1,5 @@
 # KinkList
-Updated and personalized version of the KinkList, forked off from NanoAi's version: (https://github.com/NanoAi/KinkList)
+Updated and personalized version of the KinkList, forked from NanoAi's version: (https://github.com/NanoAi/KinkList)
 
 [Fill it out yourself here:]
 
