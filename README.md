@@ -5,6 +5,7 @@ Updated and personalized version of the original KinkList from [Goctini](https:/
 
 If the link about isn't working (error 429 "too many requests"), just wait a few minutes and click the link again. Sadly, this is out of my control.
 
+Note: Example is likely to change. This kinklist is meant to be all-encompassing, and many will be added as time goes on.
 #### Example
 
 ![Example kinklist](https://i.imgur.com/tWsl99a.png)
