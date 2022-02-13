@@ -95,6 +95,7 @@ td+td {
 .legend {
     vertical-align: middle;
     font-size: 14px;
+    margin-top: 20px;
 }
 
 .legend div {
