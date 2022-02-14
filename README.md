@@ -1,7 +1,7 @@
 # KinkList
 Updated and personalized version of the original KinkList from [Goctini](https://github.com/Goctionni/KinkList), forked from [NanoAi's version](https://github.com/NanoAi/KinkList)
 
-[Fill this version out yourself here](https://raw.githack.com/RedKnight26/KinkList/master/kinklist.html)
+[Fill this version out yourself here](https://redknight26.github.io/KinkList/)
 
 If the link about isn't working (error 429 "too many requests"), just wait a few minutes and click the link again. Sadly, this is out of my control.
 
