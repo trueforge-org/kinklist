@@ -8,4 +8,4 @@ Note: Example is likely to change. This kinklist is meant to be all-encompassing
 
 ![Example kinklist](https://i.imgur.com/HHfWsXw.png)
 
-To make your own version, make a fork off this one or another and edit the kinklist.html file
+To make your own version, make a fork off this one or another and edit the index.html file
