@@ -100,6 +100,7 @@ td+td {
 
 .legend div {
     display: inline-block;
+    padding-right: 20px;
 }
 
 .legend .choice {
@@ -186,7 +187,7 @@ td+td {
         left: 255px;
     }
     .legend div {
-        width: 130px;
+        padding-right: 20px;
     }
     #ExportWrapper {
         position: absolute;
@@ -200,7 +201,7 @@ td+td {
 
 @media (max-width: 1700px) and (min-width: 800px) {
     .legend div {
-        width: 130px;
+        padding-right: 20px;
         padding-bottom: 10px;
     }
     #ExportWrapper {
@@ -212,9 +213,8 @@ td+td {
 
 @media (max-width: 800px) and (min-width: 598px) {
     .legend div {
-        width: 180px;
+        padding-right: 25px;
         padding-bottom: 10px;
-        padding-left: 10px;
     }
     #ExportWrapper {
         position: relative;
@@ -242,9 +242,8 @@ td+td {
         min-width: 345px;
     }
     .legend div {
-        width: 150px;
+        padding-right: 25px;
         padding-bottom: 10px;
-        padding-left: 10px;
     }
     #ExportWrapper {
         position: relative;
