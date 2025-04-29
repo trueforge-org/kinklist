@@ -530,12 +530,22 @@ $(function () {
 				if (!lvlInt) lvlInt = 0;
 				hashValues.push(lvlInt);
 			});
-			return inputKinks.encode(Object.keys(colors).length, hashValues);
+		
+			// Generate the hash
+			var newHash = inputKinks.encode(Object.keys(colors).length, hashValues);
+		
+			// Only update the hash if it's different
+			if (newHash !== location.hash.substring(1)) {
+				history.replaceState(null, null, "#" + newHash); // Update hash without reload
+			}
+		
+			return newHash;
 		},
+		
 		parseHash: function () {
 			var hash = location.hash.substring(1);
 			if (hash.length < 10) return;
-
+		
 			var values = inputKinks.decode(Object.keys(colors).length, hash);
 			var valueIndex = 0;
 			$("#InputList .choices").each(function () {
@@ -544,115 +554,143 @@ $(function () {
 				$this.children().eq(value).addClass("selected");
 			});
 		},
+		
 		saveSelection: function () {
 			var selection = [];
 			$(".choice.selected").each(function () {
 				// .choice selector
 				var selector = "." + this.className.replace(/ /g, ".");
+				
 				// .choices selector
-				selector =
-					"." +
-					$(this).closest(".choices")[0].className.replace(/ /g, ".") +
-					" " +
-					selector;
+				selector = "." + $(this).closest(".choices")[0].className.replace(/ /g, ".") + " " + selector;
+				
 				// .kinkRow selector
-				selector =
-					"." +
-					$(this).closest("tr.kinkRow")[0].className.replace(/ /g, ".") +
-					" " +
-					selector;
+				selector = "." + $(this).closest("tr.kinkRow")[0].className.replace(/ /g, ".") + " " + selector;
+				
 				// .kinkCategory selector
-				selector =
-					"." +
-					$(this).closest(".kinkCategory")[0].className.replace(/ /g, ".") +
-					" " +
-					selector;
+				selector = "." + $(this).closest(".kinkCategory")[0].className.replace(/ /g, ".") + " " + selector;
+				
+				// Remove the '.selected' part
 				selector = selector.replace(".selected", "");
+				
 				selection.push(selector);
 			});
-			return selection;
+		
+			// Use requestAnimationFrame for smoother DOM manipulation
+			requestAnimationFrame(() => {
+				return selection;
+			});
 		},
+		
 		inputListToText: function () {
 			var KinksText = "";
 			var kinkCats = Object.keys(kinks);
-			for (var i = 0; i < kinkCats.length; i++) {
-				var catName = kinkCats[i];
+			
+			kinkCats.forEach((catName) => {
 				var catFields = kinks[catName].fields;
 				var catKinks = kinks[catName].kinks;
 				KinksText += "#" + catName + "\r\n";
 				KinksText += "(" + catFields.join(", ") + ")\r\n";
-				for (var j = 0; j < catKinks.length; j++) {
-					KinksText += "* " + catKinks[j] + "\r\n";
-				}
+				catKinks.forEach((kink) => {
+					KinksText += "* " + kink + "\r\n";
+				});
 				KinksText += "\r\n";
-			}
+			});
+		
 			return KinksText;
 		},
+		
 		restoreSavedSelection: function (selection) {
-			setTimeout(function () {
-				for (var i = 0; i < selection.length; i++) {
-					var selector = selection[i];
+			// Temporarily disable hash change to prevent unwanted scrolling/reloading behavior
+			const currentHash = location.hash;
+			
+			// Use requestAnimationFrame for smoother updates
+			requestAnimationFrame(() => {
+				selection.forEach((selector) => {
 					$(selector).addClass("selected");
+				});
+		
+				// Only update the hash if it's different from the current one
+				const newHash = inputKinks.updateHash();
+				if (newHash !== currentHash) {
+					history.replaceState(null, null, newHash); // Updates the hash without causing a page reload
 				}
-				location.hash = inputKinks.updateHash();
-			}, 300);
+			});
 		},
+		
 		parseKinksText: function (kinksText) {
 			var newKinks = {};
 			var lines = kinksText.replace(/\r/g, "").split("\n");
-
+		
 			var cat = null;
 			var catName = null;
-			for (var i = 0; i < lines.length; i++) {
-				var line = lines[i];
-				if (!line.length) continue;
-
-				if (line[0] === "#") {
-					if (catName) {
-						if (!(cat.fields instanceof Array) || cat.fields.length < 1) {
-							alert(catName + " does not have any fields defined!");
-							return;
+			
+			// Using requestAnimationFrame for smoother DOM manipulation
+			requestAnimationFrame(() => {
+				for (var i = 0; i < lines.length; i++) {
+					var line = lines[i];
+					if (!line.length) continue;
+		
+					if (line[0] === "#") {
+						if (catName) {
+							if (!(cat.fields instanceof Array) || cat.fields.length < 1) {
+								alert(catName + " does not have any fields defined!");
+								return;
+							}
+							if (!(cat.kinks instanceof Array) || cat.kinks.length < 1) {
+								alert(catName + " does not have any kinks listed!");
+								return;
+							}
+							newKinks[catName] = cat;
 						}
-						if (!(cat.kinks instanceof Array) || cat.kinks.length < 1) {
-							alert(catName + " does not have any kinks listed!");
-							return;
+						catName = line.substring(1).trim();
+						cat = {
+							kinks: []
+						};
+					}
+		
+					if (!catName) continue;
+					if (line[0] === "(") {
+						cat.fields = line
+							.substring(1, line.length - 1)
+							.trim()
+							.split(",");
+						for (var j = 0; j < cat.fields.length; j++) {
+							cat.fields[j] = cat.fields[j].trim();
 						}
-						newKinks[catName] = cat;
 					}
-					catName = line.substring(1).trim();
-					cat = {
-						kinks: []
-					};
-				}
-				if (!catName) continue;
-				if (line[0] === "(") {
-					cat.fields = line
-						.substring(1, line.length - 1)
-						.trim()
-						.split(",");
-					for (var j = 0; j < cat.fields.length; j++) {
-						cat.fields[j] = cat.fields[j].trim();
+					if (line[0] === "*") {
+						var kink = line.substring(1).trim();
+						cat.kinks.push(kink);
 					}
 				}
-				if (line[0] === "*") {
-					var kink = line.substring(1).trim();
-					cat.kinks.push(kink);
+		
+				// Final check after parsing
+				if (catName && !newKinks[catName]) {
+					if (!(cat.fields instanceof Array) || cat.fields.length < 1) {
+						alert(catName + " does not have any fields defined!");
+						return;
+					}
+					if (!(cat.kinks instanceof Array) || cat.kinks.length < 1) {
+						alert(catName + " does not have any kinks listed!");
+						return;
+					}
+					newKinks[catName] = cat;
 				}
-			}
-			if (catName && !newKinks[catName]) {
-				if (!(cat.fields instanceof Array) || cat.fields.length < 1) {
-					alert(catName + " does not have any fields defined!");
-					return;
+		
+				// Updating the hash in the URL (with no page refresh)
+				var hashValues = [];
+				for (var cat in newKinks) {
+					hashValues.push(newKinks[cat].kinks.length); // Assuming we are encoding the number of kinks
 				}
-				if (!(cat.kinks instanceof Array) || cat.kinks.length < 1) {
-					alert(catName + " does not have any kinks listed!");
-					return;
+				var newHash = inputKinks.encode(Object.keys(colors).length, hashValues);
+				if (newHash !== location.hash.substring(1)) {
+					history.replaceState(null, null, "#" + newHash); // Update hash without page refresh
 				}
-				newKinks[catName] = cat;
-			}
+			});
+		
 			return newKinks;
-		},
-	};
+		}},		
 
 	$("#Edit").on("click", function () {
 		var KinksText = inputKinks.inputListToText();
