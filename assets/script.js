@@ -1,8 +1,8 @@
 // Logarithm function to calculate log with any base
-const log = (val, base) => Math.log(val) / Math.log(base);
+let log = (val, base) => Math.log(val) / Math.log(base);
 
 // Converts a string to a valid class name with proper capitalization
-const strToClass = (str) => {
+let strToClass = (str) => {
   const validChars = "abcdefghijklmnopqrstuvwxyz";
   let className = "";
   let newWord = false;
@@ -31,10 +31,10 @@ const addCssRule = (selector, rules) => {
 };
 
 // Example of variable initialization, can be modified or populated later
-const kinks = {};
-const inputKinks = {};
-const colors = {};
-const level = {};
+let kinks = {};
+let inputKinks = {};
+let colors = {};
+let level = {};
 
 // Tracking state to prevent unnecessary reloads
 let previousState = {
@@ -45,7 +45,7 @@ let previousState = {
 };
 
 // Check if state has changed to avoid redundant actions
-const hasStateChanged = () => {
+let hasStateChanged = () => {
   return JSON.stringify(kinks) !== JSON.stringify(previousState.kinks) ||
          JSON.stringify(inputKinks) !== JSON.stringify(previousState.inputKinks) ||
          JSON.stringify(colors) !== JSON.stringify(previousState.colors) ||
@@ -53,7 +53,7 @@ const hasStateChanged = () => {
 };
 
 // Updates state and prevents unnecessary reloads
-const updateState = () => {
+let updateState = () => {
   if (hasStateChanged()) {
     previousState = { kinks, inputKinks, colors, level };
     console.log('State has changed, performing action...');
@@ -64,7 +64,7 @@ const updateState = () => {
 };
 
 // Call this function whenever you need to check and update the state
-const checkAndUpdate = () => {
+let checkAndUpdate = () => {
   updateState();
 };
 
