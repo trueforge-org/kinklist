@@ -37,7 +37,7 @@ var level = {};
 $(function () {
 	var imgurClientId = "9db53e5936cd02f";
 	let previousInput = null;
-
+	let previousOutput = null;
 	let debounceTimeout;
 
 function debounce(fn, delay) {
@@ -422,29 +422,34 @@ function debounce(fn, delay) {
 			});
 		},		
 		encode: function (base, input) {
+			// Check if input hasn't changed
 			if (input === previousInput) {
+				console.log('Skipping encoding: Input is the same');
 				return; // Avoid running encoding if input hasn't changed
 			}
-		
+			
+			// Update previous input to the current one
 			previousInput = input;
+			console.log('Encoding input with base:', base, 'and input length:', input.length);
+	
 			const hashBase = inputKinks.hashChars.length;
 			const outputPow = inputKinks.maxPow(hashBase, Number.MAX_SAFE_INTEGER);
 			const inputPow = inputKinks.maxPow(base, Math.pow(hashBase, outputPow));
-		
+	
 			let output = "";
 			const numChunks = Math.ceil(input.length / inputPow);
 			let inputIndex = 0;
-		
+	
 			for (let chunkId = 0; chunkId < numChunks; chunkId++) {
 				let inputIntValue = 0;
-		
+	
 				// Process each chunk of input
 				for (let pow = 0; pow < inputPow; pow++) {
 					const inputVal = input[inputIndex++];
 					if (typeof inputVal === "undefined") break;
 					inputIntValue += inputVal * Math.pow(base, pow);
 				}
-		
+	
 				let outputCharValue = "";
 				
 				// Convert the chunk's integer value to a string
@@ -456,35 +461,41 @@ function debounce(fn, delay) {
 					outputCharValue += char;
 					inputIntValue -= charInt * powVal;
 				}
-		
+	
 				// Ensure output chunk has the correct length
 				const chunk = inputKinks.prefix(outputCharValue, outputPow, inputKinks.hashChars[0]);
 				output += chunk;
 			}
-		
+	
+			console.log('Encoding result:', output);
 			return output;
 		},
 		
 		decode: function (base, output) {
+			// Check if output hasn't changed
 			if (output === previousOutput) {
+				console.log('Skipping decoding: Output is the same');
 				return; // Avoid running decoding if output hasn't changed
 			}
-		
+	
+			// Update previous output to the current one
 			previousOutput = output;
-		
+			console.log('Decoding output with base:', base, 'and output length:', output.length);
+	
 			const hashBase = inputKinks.hashChars.length;
 			const outputPow = inputKinks.maxPow(hashBase, Number.MAX_SAFE_INTEGER);
-		
+	
 			let values = [];
 			const numChunks = Math.ceil(output.length / outputPow);
-		
+	
 			// Process each chunk in the output
 			for (let i = 0; i < numChunks; i++) {
 				const chunk = output.substring(i * outputPow, (i + 1) * outputPow);
 				const chunkValues = inputKinks.decodeChunk(base, chunk);
 				values = values.concat(chunkValues);
 			}
-		
+	
+			console.log('Decoded values:', values);
 			return values;
 		},
 		
@@ -492,9 +503,9 @@ function debounce(fn, delay) {
 			const hashBase = inputKinks.hashChars.length;
 			const outputPow = inputKinks.maxPow(hashBase, Number.MAX_SAFE_INTEGER);
 			const inputPow = inputKinks.maxPow(base, Math.pow(hashBase, outputPow));
-		
+	
 			let chunkInt = 0;
-		
+	
 			// Convert the chunk's string value to an integer
 			for (let i = 0; i < chunk.length; i++) {
 				const char = chunk[i];
@@ -502,9 +513,9 @@ function debounce(fn, delay) {
 				const pow = chunk.length - 1 - i;
 				chunkInt += charInt * Math.pow(hashBase, pow);
 			}
-		
+	
 			const output = [];
-		
+	
 			// Convert the integer back into an array of base values
 			for (let pow = inputPow - 1; pow >= 0; pow--) {
 				const posBase = Math.floor(Math.pow(base, pow));
@@ -512,39 +523,45 @@ function debounce(fn, delay) {
 				output.push(posVal);
 				chunkInt -= posVal * posBase;
 			}
-		
+	
+			console.log('Decoded chunk to values:', output.reverse());
 			return output.reverse();
 		},
 		
 		updateHash: function () {
-			var hashValues = [];
+			let hashValues = [];
 			$("#InputList .choices").each(function () {
-				var $this = $(this);
-				var lvlInt = $this.find(".selected").data("levelInt");
+				const $this = $(this);
+				let lvlInt = $this.find(".selected").data("levelInt");
 				if (!lvlInt) lvlInt = 0;
 				hashValues.push(lvlInt);
 			});
-		
+	
 			// Generate the hash
-			var newHash = inputKinks.encode(Object.keys(colors).length, hashValues);
-		
+			const newHash = inputKinks.encode(Object.keys(colors).length, hashValues);
+	
 			// Only update the hash if it's different
 			if (newHash !== location.hash.substring(1)) {
+				console.log('Updating hash:', newHash);
 				history.replaceState(null, null, "#" + newHash); // Update hash without reload
+			} else {
+				console.log('Hash is unchanged, skipping update');
 			}
-		
+	
 			return newHash;
 		},
 		
 		parseHash: function () {
-			var hash = location.hash.substring(1);
+			const hash = location.hash.substring(1);
 			if (hash.length < 10) return;
-		
-			var values = inputKinks.decode(Object.keys(colors).length, hash);
-			var valueIndex = 0;
+			
+			console.log('Parsing hash:', hash);
+			const values = inputKinks.decode(Object.keys(colors).length, hash);
+			let valueIndex = 0;
+	
 			$("#InputList .choices").each(function () {
-				var $this = $(this);
-				var value = values[valueIndex++];
+				const $this = $(this);
+				const value = values[valueIndex++];
 				$this.children().eq(value).addClass("selected");
 			});
 		},
