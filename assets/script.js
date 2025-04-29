@@ -36,6 +36,14 @@ var level = {};
 
 $(function () {
 	var imgurClientId = "9db53e5936cd02f";
+	let previousInput = null;
+
+	let debounceTimeout;
+
+function debounce(fn, delay) {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(fn, delay);
+}
 
 	inputKinks = {
 		$columns: [],
@@ -414,6 +422,11 @@ $(function () {
 			});
 		},		
 		encode: function (base, input) {
+			if (input === previousInput) {
+				return; // Avoid running encoding if input hasn't changed
+			}
+		
+			previousInput = input;
 			const hashBase = inputKinks.hashChars.length;
 			const outputPow = inputKinks.maxPow(hashBase, Number.MAX_SAFE_INTEGER);
 			const inputPow = inputKinks.maxPow(base, Math.pow(hashBase, outputPow));
@@ -453,6 +466,12 @@ $(function () {
 		},
 		
 		decode: function (base, output) {
+			if (output === previousOutput) {
+				return; // Avoid running decoding if output hasn't changed
+			}
+		
+			previousOutput = output;
+		
 			const hashBase = inputKinks.hashChars.length;
 			const outputPow = inputKinks.maxPow(hashBase, Number.MAX_SAFE_INTEGER);
 		
