@@ -19,7 +19,7 @@ let strToClass = (str) => {
 };
 
 // Adds a new CSS rule to the first stylesheet in the document
-const addCssRule = (selector, rules) => {
+let addCssRule = (selector, rules) => {
   const sheet = document.styleSheets[0];
   const ruleString = `${selector} { ${rules} }`;
 
