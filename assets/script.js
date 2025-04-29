@@ -124,65 +124,87 @@ $(function () {
 				}
 				inputKinks.$columns[colIndex].append($categories[i]);
 			}
-		},
-		fillInputList: function () {
+		},fillInputList: function () {
+			// Empty the input list container
 			$("#InputList").empty();
+			
+			// Create the columns for input list
 			inputKinks.createColumns();
-
+		
 			var $categories = [];
 			var kinkCats = Object.keys(kinks);
-			for (var i = 0; i < kinkCats.length; i++) {
-				var catName = kinkCats[i];
+		
+			// Iterate over each category and generate the necessary elements
+			kinkCats.forEach(catName => {
 				var category = kinks[catName];
 				var fields = category.fields;
 				var kinkArr = category.kinks;
-
+		
 				var $category = inputKinks.createCategory(catName, fields);
 				var $tbody = $category.find("tbody");
-				for (var k = 0; k < kinkArr.length; k++) {
-					$tbody.append(inputKinks.createKink(fields, kinkArr[k]));
-				}
-
+		
+				// Append each kink to the category's table body
+				kinkArr.forEach(kink => {
+					$tbody.append(inputKinks.createKink(fields, kink));
+				});
+		
 				$categories.push($category);
-			}
+			});
+		
+			// Place the categories into the DOM
 			inputKinks.placeCategories($categories);
-
-			// Make things update hash
+		
+			// Attach event listener for the choices buttons to update the hash without page refresh
 			$("#InputList")
 				.find("button.choice")
+				.off("click") // Prevent duplicate event listeners
 				.on("click", function () {
-					location.hash = inputKinks.updateHash();
+					var newHash = inputKinks.updateHash();
+					if (newHash !== location.hash.substring(1)) {
+						history.replaceState(null, null, "#" + newHash); // Update hash without page refresh
+					}
 				});
-		},
+		},		
 		init: function () {
 			// Set up DOM
 			inputKinks.fillInputList();
-
+		
 			// Read hash
 			inputKinks.parseHash();
-
+		
+			// Setup event listeners
+			this.setupEventListeners();
+		
+			// Handle window resize
+			this.setupResizeHandler();
+		},
+		
+		setupEventListeners: function () {
 			// Make export button work
 			$("#Export").on("click", inputKinks.export);
+		
+			// Select text on URL click
 			$("#URL").on("click", function () {
 				this.select();
 			});
-
-			// On resize, redo columns
-			(function () {
-				var lastResize = 0;
-				$(window).on("resize", function () {
-					var curTime = new Date().getTime();
-					lastResize = curTime;
-					setTimeout(function () {
-						if (lastResize === curTime) {
-							inputKinks.fillInputList();
-							inputKinks.parseHash();
-						}
-					}, 500);
-				});
-			})();
 		},
+		
+		setupResizeHandler: function () {
+			var lastResize = 0;
+			$(window).on("resize", function () {
+				var curTime = new Date().getTime();
+				lastResize = curTime;
+				setTimeout(function () {
+					if (lastResize === curTime) {
+						inputKinks.fillInputList();
+						inputKinks.parseHash();
+					}
+				}, 500);
+			});
+		},
+		
 		hashChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.=+*^!@",
+		
 		maxPow: function (base, maxVal) {
 			var maxPow = 1;
 			for (var pow = 1; Math.pow(base, pow) <= maxVal; pow++) {
@@ -190,58 +212,53 @@ $(function () {
 			}
 			return maxPow;
 		},
+		
 		prefix: function (input, len, char) {
-			while (input.length < len) {
-				input = char + input;
-			}
-			return input;
+			return input.padStart(len, char);
 		},
+		
 		drawLegend: function (context) {
 			context.font = "bold 13px Arial";
 			context.fillStyle = "#000000";
-
+		
 			var levels = Object.keys(colors);
 			var x = context.canvas.width - 15 - 120 * levels.length;
-			for (var i = 0; i < levels.length; i++) {
+			
+			levels.forEach((level, i) => {
 				context.beginPath();
 				context.arc(x + 120 * i, 17, 8, 0, 2 * Math.PI, false);
-				context.fillStyle = colors[levels[i]];
+				context.fillStyle = colors[level];
 				context.fill();
 				context.strokeStyle = "rgba(0, 0, 0, 0.5)";
 				context.lineWidth = 1;
 				context.stroke();
-
+		
 				context.fillStyle = "#000000";
-				context.fillText(levels[i], x + 15 + i * 120, 22);
-			}
+				context.fillText(level, x + 15 + i * 120, 22);
+			});
 		},
+		
 		setupCanvas: function (width, height, username) {
 			$("canvas").remove();
 			var canvas = document.createElement("canvas");
 			canvas.width = width;
 			canvas.height = height;
-
-			var $canvas = $(canvas);
-			$canvas.css({
-				width: width,
-				height: height,
-			});
-			// $canvas.insertBefore($('#InputList'));
-
+		
+			var $canvas = $(canvas).css({ width: width, height: height });
 			var context = canvas.getContext("2d");
+			
 			context.fillStyle = "#FFFFFF";
 			context.fillRect(0, 0, canvas.width, canvas.height);
-
+		
 			context.font = "bold 24px Arial";
 			context.fillStyle = "#000000";
 			context.fillText("Kinklist " + username, 5, 25);
-
+		
 			inputKinks.drawLegend(context);
-			return {
-				context: context,
-				canvas: canvas
-			};
+			
+			return { context, canvas };
 		},
+		
 		drawCallHandlers: {
 			simpleTitle: function (context, drawCall) {
 				context.fillStyle = "#000000";
@@ -252,7 +269,7 @@ $(function () {
 				context.fillStyle = "#000000";
 				context.font = "bold 18px Arial";
 				context.fillText(drawCall.data.category, drawCall.x, drawCall.y + 5);
-
+		
 				var fieldsStr = drawCall.data.fields.join(", ");
 				context.font = "italic 12px Arial";
 				context.fillText(fieldsStr, drawCall.x, drawCall.y + 20);
@@ -260,19 +277,17 @@ $(function () {
 			kinkRow: function (context, drawCall) {
 				context.fillStyle = "#000000";
 				context.font = "12px Arial";
-
+		
 				var x = drawCall.x + 5 + drawCall.data.choices.length * 20;
 				var y = drawCall.y - 6;
 				context.fillText(drawCall.data.text, x, y);
-
-				// Circles
-				for (var i = 0; i < drawCall.data.choices.length; i++) {
-					var choice = drawCall.data.choices[i];
+		
+				// Circles for choices
+				drawCall.data.choices.forEach((choice, i) => {
 					var color = colors[choice];
-
 					var x = 10 + drawCall.x + i * 20;
 					var y = drawCall.y - 10;
-
+		
 					context.beginPath();
 					context.arc(x, y, 8, 0, 2 * Math.PI, false);
 					context.fillStyle = color;
@@ -280,78 +295,59 @@ $(function () {
 					context.strokeStyle = "rgba(0, 0, 0, 0.5)";
 					context.lineWidth = 1;
 					context.stroke();
-				}
+				});
 			},
 		},
+		
 		export: function () {
 			var username = prompt("Please enter your name");
-			if (typeof username !== "string") return;
-			else if (username.length) username = "(" + username + ")";
-
+			if (typeof username !== "string" || !username.length) return;
+		
+			username = `(${username})`;
+		
 			$("#Loading").fadeIn();
 			$("#URL").fadeOut();
-
+		
 			// Constants
-			var numCols = 6;
-			var columnWidth = 250;
-			var simpleTitleHeight = 35;
-			var titleSubtitleHeight = 50;
-			var rowHeight = 25;
-			var offsets = {
-				left: 10,
-				right: 10,
-				top: 50,
-				bottom: 10,
-			};
-
-			// Find out how many we have of everything
+			const numCols = 6, columnWidth = 250, simpleTitleHeight = 35,
+				  titleSubtitleHeight = 50, rowHeight = 25,
+				  offsets = { left: 10, right: 10, top: 50, bottom: 10 };
+		
+			// Calculate number of categories and kinks
 			var numCats = $(".kinkCategory").length;
 			var dualCats = $(".kinkCategory th + th + th").length;
 			var simpleCats = numCats - dualCats;
 			var numKinks = $(".kinkRow").length;
-
-			// Determine the height required for all categories and kinks
-			var totalHeight =
-				numKinks * rowHeight +
-				dualCats * titleSubtitleHeight +
-				simpleCats * simpleTitleHeight;
-
-			// Initialize columns and drawStacks
-			var columns = [];
-			for (var i = 0; i < numCols; i++) {
-				columns.push({
-					height: 0,
-					drawStack: []
-				});
-			}
-
-			// Create drawcalls and place them in the drawStack
-			// for the appropriate column
+		
+			// Calculate total height required
+			var totalHeight = numKinks * rowHeight + dualCats * titleSubtitleHeight + simpleCats * simpleTitleHeight;
+		
+			// Initialize columns and draw stacks
+			var columns = Array.from({ length: numCols }, () => ({ height: 0, drawStack: [] }));
+		
+			// Create drawcalls and place them in the appropriate column
 			var avgColHeight = totalHeight / numCols;
 			var columnIndex = 0;
+		
 			$(".kinkCategory").each(function () {
 				var $cat = $(this);
 				var catName = $cat.data("category");
 				var category = kinks[catName];
 				var fields = category.fields;
 				var catKinks = category.kinks;
-
-				var catHeight = 0;
-				catHeight +=
-					fields.length === 1 ? simpleTitleHeight : titleSubtitleHeight;
+		
+				var catHeight = fields.length === 1 ? simpleTitleHeight : titleSubtitleHeight;
 				catHeight += catKinks.length * rowHeight;
-
-				// Determine which column to place this category in
-				if (columns[columnIndex].height + catHeight / 2 > avgColHeight)
-					columnIndex++;
+		
+				// Determine column for this category
+				if (columns[columnIndex].height + catHeight / 2 > avgColHeight) columnIndex++;
 				while (columnIndex >= numCols) columnIndex--;
 				var column = columns[columnIndex];
-
-				// Drawcall for title
-				var drawCall = {
-					y: column.height
-				};
+		
+				// Create drawcall for category title
+				var drawCall = { y: column.height };
 				column.drawStack.push(drawCall);
+		
 				if (fields.length < 2) {
 					column.height += simpleTitleHeight;
 					drawCall.type = "simpleTitle";
@@ -359,81 +355,53 @@ $(function () {
 				} else {
 					column.height += titleSubtitleHeight;
 					drawCall.type = "titleSubtitle";
-					drawCall.data = {
-						category: catName,
-						fields: fields,
-					};
+					drawCall.data = { category: catName, fields };
 				}
-
-				// Drawcalls for kinks
+		
+				// Create drawcalls for kinks
 				$cat.find(".kinkRow").each(function () {
 					var $kinkRow = $(this);
+					var kinkText = $kinkRow.data("kink");
+		
 					var drawCall = {
 						y: column.height,
 						type: "kinkRow",
-						data: {
-							choices: [],
-							text: $kinkRow.data("kink"),
-						},
+						data: { choices: [], text: kinkText },
 					};
 					column.drawStack.push(drawCall);
 					column.height += rowHeight;
-
-					// Add choices
+		
 					$kinkRow.find(".choices").each(function () {
 						var $selection = $(this).find(".choice.selected");
-						var selection =
-							$selection.length > 0 ?
-							$selection.data("level") :
-							Object.keys(level)[0];
-
+						var selection = $selection.length > 0 ? $selection.data("level") : Object.keys(level)[0];
 						drawCall.data.choices.push(selection);
 					});
 				});
 			});
-
-			var tallestColumnHeight = 0;
-			for (var i = 0; i < columns.length; i++) {
-				if (tallestColumnHeight < columns[i].height) {
-					tallestColumnHeight = columns[i].height;
-				}
-			}
-
+		
+			var tallestColumnHeight = Math.max(...columns.map(c => c.height));
 			var canvasWidth = offsets.left + offsets.right + columnWidth * numCols;
 			var canvasHeight = offsets.top + offsets.bottom + tallestColumnHeight;
 			var setup = inputKinks.setupCanvas(canvasWidth, canvasHeight, username);
 			var context = setup.context;
 			var canvas = setup.canvas;
-
-			for (var i = 0; i < columns.length; i++) {
-				var column = columns[i];
-				var drawStack = column.drawStack;
-
+		
+			// Draw everything
+			columns.forEach((column, i) => {
 				var drawX = offsets.left + columnWidth * i;
-				for (var j = 0; j < drawStack.length; j++) {
-					var drawCall = drawStack[j];
+				column.drawStack.forEach((drawCall) => {
 					drawCall.x = drawX;
 					drawCall.y += offsets.top;
 					inputKinks.drawCallHandlers[drawCall.type](context, drawCall);
-				}
-			}
-
-			// return $(canvas).insertBefore($('#InputList'));
-
-			// Send canvas to imgur
+				});
+			});
+		
+			// Upload to imgur
 			$.ajax({
 				url: "https://api.imgur.com/3/image",
 				type: "POST",
-				headers: {
-					// Your application gets an imgurClientId from Imgur
-					Authorization: "Client-ID " + imgurClientId,
-					Accept: "application/json",
-				},
-				data: {
-					// convert the image data to base64
-					image: canvas.toDataURL().split(",")[1],
-					type: "base64",
-				},
+				headers: { Authorization: "Client-ID " + imgurClientId, Accept: "application/json" },
+				data: { image: canvas.toDataURL().split(",")[1], type: "base64" },
 				success: function (result) {
 					$("#Loading").hide();
 					var url = "https://i.imgur.com/" + result.data.id + ".png";
@@ -444,84 +412,91 @@ $(function () {
 					alert("Failed to upload to imgur, could not connect");
 				},
 			});
-		},
+		},		
 		encode: function (base, input) {
-			var hashBase = inputKinks.hashChars.length;
-			var outputPow = inputKinks.maxPow(hashBase, Number.MAX_SAFE_INTEGER);
-			var inputPow = inputKinks.maxPow(base, Math.pow(hashBase, outputPow));
-
-			var output = "";
-			var numChunks = Math.ceil(input.length / inputPow);
-			var inputIndex = 0;
-			for (var chunkId = 0; chunkId < numChunks; chunkId++) {
-				var inputIntValue = 0;
-				for (var pow = 0; pow < inputPow; pow++) {
-					var inputVal = input[inputIndex++];
+			const hashBase = inputKinks.hashChars.length;
+			const outputPow = inputKinks.maxPow(hashBase, Number.MAX_SAFE_INTEGER);
+			const inputPow = inputKinks.maxPow(base, Math.pow(hashBase, outputPow));
+		
+			let output = "";
+			const numChunks = Math.ceil(input.length / inputPow);
+			let inputIndex = 0;
+		
+			for (let chunkId = 0; chunkId < numChunks; chunkId++) {
+				let inputIntValue = 0;
+		
+				// Process each chunk of input
+				for (let pow = 0; pow < inputPow; pow++) {
+					const inputVal = input[inputIndex++];
 					if (typeof inputVal === "undefined") break;
-					var val = inputVal * Math.pow(base, pow);
-					inputIntValue += val;
+					inputIntValue += inputVal * Math.pow(base, pow);
 				}
-
-				var outputCharValue = "";
+		
+				let outputCharValue = "";
+				
+				// Convert the chunk's integer value to a string
 				while (inputIntValue > 0) {
-					var maxPow = Math.floor(log(inputIntValue, hashBase));
-					var powVal = Math.pow(hashBase, maxPow);
-					var charInt = Math.floor(inputIntValue / powVal);
-					var subtract = charInt * powVal;
-					var char = inputKinks.hashChars[charInt];
+					const maxPow = Math.floor(Math.log(inputIntValue) / Math.log(hashBase));
+					const powVal = Math.pow(hashBase, maxPow);
+					const charInt = Math.floor(inputIntValue / powVal);
+					const char = inputKinks.hashChars[charInt];
 					outputCharValue += char;
-					inputIntValue -= subtract;
+					inputIntValue -= charInt * powVal;
 				}
-				var chunk = inputKinks.prefix(
-					outputCharValue,
-					outputPow,
-					inputKinks.hashChars[0]
-				);
+		
+				// Ensure output chunk has the correct length
+				const chunk = inputKinks.prefix(outputCharValue, outputPow, inputKinks.hashChars[0]);
 				output += chunk;
 			}
+		
 			return output;
 		},
+		
 		decode: function (base, output) {
-			var hashBase = inputKinks.hashChars.length;
-			var outputPow = inputKinks.maxPow(hashBase, Number.MAX_SAFE_INTEGER);
-
-			var values = [];
-			var numChunks = Math.max(output.length / outputPow);
-			for (var i = 0; i < numChunks; i++) {
-				var chunk = output.substring(i * outputPow, (i + 1) * outputPow);
-				var chunkValues = inputKinks.decodeChunk(base, chunk);
-				for (var j = 0; j < chunkValues.length; j++) {
-					values.push(chunkValues[j]);
-				}
+			const hashBase = inputKinks.hashChars.length;
+			const outputPow = inputKinks.maxPow(hashBase, Number.MAX_SAFE_INTEGER);
+		
+			let values = [];
+			const numChunks = Math.ceil(output.length / outputPow);
+		
+			// Process each chunk in the output
+			for (let i = 0; i < numChunks; i++) {
+				const chunk = output.substring(i * outputPow, (i + 1) * outputPow);
+				const chunkValues = inputKinks.decodeChunk(base, chunk);
+				values = values.concat(chunkValues);
 			}
+		
 			return values;
 		},
+		
 		decodeChunk: function (base, chunk) {
-			var hashBase = inputKinks.hashChars.length;
-			var outputPow = inputKinks.maxPow(hashBase, Number.MAX_SAFE_INTEGER);
-			var inputPow = inputKinks.maxPow(base, Math.pow(hashBase, outputPow));
-
-			var chunkInt = 0;
-			for (var i = 0; i < chunk.length; i++) {
-				var char = chunk[i];
-				var charInt = inputKinks.hashChars.indexOf(char);
-				var pow = chunk.length - 1 - i;
-				var intVal = Math.pow(hashBase, pow) * charInt;
-				chunkInt += intVal;
+			const hashBase = inputKinks.hashChars.length;
+			const outputPow = inputKinks.maxPow(hashBase, Number.MAX_SAFE_INTEGER);
+			const inputPow = inputKinks.maxPow(base, Math.pow(hashBase, outputPow));
+		
+			let chunkInt = 0;
+		
+			// Convert the chunk's string value to an integer
+			for (let i = 0; i < chunk.length; i++) {
+				const char = chunk[i];
+				const charInt = inputKinks.hashChars.indexOf(char);
+				const pow = chunk.length - 1 - i;
+				chunkInt += charInt * Math.pow(hashBase, pow);
 			}
-			var chunkIntCopy = chunkInt;
-
-			var output = [];
-			for (var pow = inputPow - 1; pow >= 0; pow--) {
-				var posBase = Math.floor(Math.pow(base, pow));
-				var posVal = Math.floor(chunkInt / posBase);
-				var subtract = posBase * posVal;
+		
+			const output = [];
+		
+			// Convert the integer back into an array of base values
+			for (let pow = inputPow - 1; pow >= 0; pow--) {
+				const posBase = Math.floor(Math.pow(base, pow));
+				const posVal = Math.floor(chunkInt / posBase);
 				output.push(posVal);
-				chunkInt -= subtract;
+				chunkInt -= posVal * posBase;
 			}
-			output.reverse();
-			return output;
+		
+			return output.reverse();
 		},
+		
 		updateHash: function () {
 			var hashValues = [];
 			$("#InputList .choices").each(function () {
