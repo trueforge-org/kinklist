@@ -33,7 +33,7 @@ jobs:
           list-files: json
           filters: |
             changed:
-            - 'website/**'
+            - '**'
 
 
   release-website:
