@@ -9,9 +9,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "website/**"
-      - ".github/workflows/website.yaml"
 
 # Use `bash --noprofile --norc -exo pipefail` by default for all `run` steps in this workflow:
 # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#defaultsrun
